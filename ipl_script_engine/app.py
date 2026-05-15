@@ -5,6 +5,7 @@ import time
 from pathlib import Path
 import os
 import requests
+import base64
 
 st.set_page_config(page_title="The Scriptwriter's Revenge", page_icon="🎬")
 # Material-like styling (Roboto font + card styles)
@@ -17,6 +18,7 @@ st.markdown(
             .app-title { font-size:28px; font-weight:700; margin:0; }
             .app-sub { color: #666; margin:0; }
             .mui-card { background: #fff; border-radius:12px; padding:16px; box-shadow: 0 6px 18px rgba(22,28,45,0.08); }
+            .mui-card strong { color: #000 !important; }
             .mui-row { display:flex; gap:12px; }
             .mui-card.small { flex:1; }
             .prediction-box { background: linear-gradient(90deg, #f7f9fb, #ffffff); border-radius:10px; padding:16px; color:#000 !important; }
@@ -39,6 +41,39 @@ st.markdown(
 )
 
 st.write("")
+
+
+def _set_background_from_bytes(image_bytes: bytes):
+        encoded = base64.b64encode(image_bytes).decode()
+        css = f"""
+        <style>
+            .stApp {{
+                background-image: url('data:image/png;base64,{encoded}');
+                background-size: cover;
+                background-position: center;
+                background-attachment: fixed;
+            }}
+            /* subtle dark overlay to keep cards readable */
+            .stApp::before {{
+                content: '';
+                position: fixed;
+                inset: 0;
+                background: rgba(0,0,0,0.32);
+                pointer-events: none;
+            }}
+        </style>
+        """
+        st.markdown(css, unsafe_allow_html=True)
+
+
+def set_background_from_url(url: str):
+        try:
+                resp = requests.get(url, timeout=8)
+                resp.raise_for_status()
+                _set_background_from_bytes(resp.content)
+                return True
+        except Exception:
+                return False
 
 def get_script():
     data_path = Path(__file__).resolve().parent / 'data' / 'tweets.json'
@@ -294,3 +329,22 @@ if st.sidebar.button('Fetch News', key='fetch'):
             desc = a.get('description') or ''
             st.markdown(f"<div class='mui-card'><strong>{title}</strong><div class='muted'>Source: {src} — <a class='news-link' href='{url}' target='_blank'>Open</a></div><div style='margin-top:8px'>{desc}</div></div>", unsafe_allow_html=True)
             st.write("")
+
+# Background image controls
+st.sidebar.markdown("---")
+st.sidebar.subheader("Background")
+bg_url = st.sidebar.text_input("Background image URL (optional)", value=os.environ.get('BACKGROUND_IMAGE_URL') or '')
+bg_upload = st.sidebar.file_uploader("Or upload an image", type=['png','jpg','jpeg','webp'])
+if st.sidebar.button('Apply Background'):
+    applied = False
+    if bg_upload is not None:
+        data = bg_upload.read()
+        _set_background_from_bytes(data)
+        applied = True
+    elif bg_url:
+        applied = set_background_from_url(bg_url)
+
+    if applied:
+        st.sidebar.success('Background applied')
+    else:
+        st.sidebar.error('Failed to apply background. Check URL or file type.')
