@@ -7,9 +7,35 @@ import os
 import requests
 
 st.set_page_config(page_title="The Scriptwriter's Revenge", page_icon="🎬")
+# Material-like styling (Roboto font + card styles)
+st.markdown(
+        """
+        <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+        <style>
+            html, body { font-family: 'Roboto', sans-serif; }
+            .app-header { display:flex; align-items:center; gap:12px; }
+            .app-title { font-size:28px; font-weight:700; margin:0; }
+            .app-sub { color: #666; margin:0; }
+            .mui-card { background: #fff; border-radius:12px; padding:16px; box-shadow: 0 6px 18px rgba(22,28,45,0.08); }
+            .mui-row { display:flex; gap:12px; }
+            .mui-card.small { flex:1; }
+            .prediction-box { background: linear-gradient(90deg, #f7f9fb, #ffffff); border-radius:10px; padding:16px; }
+            .muted { color:#666; font-size:14px }
+            .news-link { color:#1a73e8; text-decoration:none; }
+            .icon { font-size:26px }
+        </style>
+        <div class="app-header">
+            <div class="icon">🎬</div>
+            <div>
+                <div class="app-title">The Scriptwriter's Revenge</div>
+                <div class="app-sub">Live IPL Conspiracy Generator — sentiment & quick predictions</div>
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+)
 
-st.title("🎬 The Scriptwriter's Revenge")
-st.subheader("Live IPL Conspiracy Generator")
+st.write("")
 
 def get_script():
     data_path = Path(__file__).resolve().parent / 'data' / 'tweets.json'
@@ -133,7 +159,7 @@ def generate_prediction(reactions, min_words=40, max_words=100):
     for e in extras:
         clean = re.sub(r"\s+", " ", e.strip())
         if clean:
-            sentences.append(f"For example, users said: \"{clean}\".")
+            sentences.append(f"\"{clean}\".")
         if len(" ".join(sentences).split()) >= min_words:
             break
 
@@ -210,25 +236,49 @@ def fetch_news(query, max_results=5):
     )
     return []
 
-if st.button('Generate New Plot Twist'):
-    points = get_script()
-    st.info(f"🚨 **LEAKED SCRIPT:** {points[0]}")
-    st.warning(f"🕵️ **MATCH ANOMALY:** {points[1]}")
-    st.error(f"💀 **THE CLIMAX:** {points[2]}")
-    prediction = generate_prediction(points, min_words=40, max_words=100)
-    st.subheader("Prediction")
-    st.write(prediction)
+col1, col2 = st.columns([2, 1])
+
+with col1:
+    if st.button('Generate New Plot Twist', key='generate'):
+        points = get_script()
+        # three small material-like cards
+        c1, c2, c3 = st.columns(3)
+        with c1:
+            st.markdown(f"<div class='mui-card small'><strong>🚨 LEAKED SCRIPT</strong><div class='muted'>{points[0]}</div></div>", unsafe_allow_html=True)
+        with c2:
+            st.markdown(f"<div class='mui-card small'><strong>🕵️ MATCH ANOMALY</strong><div class='muted'>{points[1]}</div></div>", unsafe_allow_html=True)
+        with c3:
+            st.markdown(f"<div class='mui-card small'><strong>💀 THE CLIMAX</strong><div class='muted'>{points[2]}</div></div>", unsafe_allow_html=True)
+
+        prediction = generate_prediction(points, min_words=40, max_words=100)
+        st.markdown(f"<div class='mui-card prediction-box'><h4 style='margin:0 0 8px 0'>Prediction</h4><div>{prediction}</div></div>", unsafe_allow_html=True)
+
+with col2:
+    st.markdown("<div class='mui-card'><strong>Live Summary</strong></div>", unsafe_allow_html=True)
+    st.write("- Monitoring sentiment for LSG vs CSK")
+    st.write("- Latest reactions sampled from fan posts")
+    st.write("")
 
 st.write("---")
 st.write("Monitoring live sentiment for LSG vs CSK...")
 
 
 st.write("---")
-st.header("Cricket News Search")
-query = st.text_input("Search query", value="cricket tweets")
-max_results = st.slider("Max results", min_value=1, max_value=10, value=5)
-if st.button('Fetch News'):
+st.markdown("<div class='muted'>News & external sources</div>", unsafe_allow_html=True)
+
+# Sidebar: API keys and news search
+st.sidebar.header("News & Settings")
+query = st.sidebar.text_input("Search query", value="cricket tweets")
+max_results = st.sidebar.slider("Max results", min_value=1, max_value=10, value=5)
+gnews_key = st.sidebar.text_input("GNews API Key", value=os.environ.get('GNEWS_API_KEY') or '', help='Set GNEWS_API_KEY env var for deployments')
+newsapi_key = st.sidebar.text_input("NewsAPI Key", value=os.environ.get('NEWSAPI_KEY') or '', help='Set NEWSAPI_KEY env var for deployments')
+if st.sidebar.button('Fetch News', key='fetch'):
     with st.spinner('Fetching news...'):
+        # if user filled keys in sidebar, use them temporarily
+        if gnews_key:
+            os.environ['GNEWS_API_KEY'] = gnews_key
+        if newsapi_key:
+            os.environ['NEWSAPI_KEY'] = newsapi_key
         articles = fetch_news(query, max_results=max_results)
 
     if not articles:
@@ -239,8 +289,5 @@ if st.button('Fetch News'):
             url = a.get('url') or '#'
             src = a.get('source') or 'unknown'
             desc = a.get('description') or ''
-            st.markdown(f"**{title}**  ")
-            st.markdown(f"Source: {src} — [{url}]({url})")
-            if desc:
-                st.write(desc)
-            st.write("---")
+            st.markdown(f"<div class='mui-card'><strong>{title}</strong><div class='muted'>Source: {src} — <a class='news-link' href='{url}' target='_blank'>Open</a></div><div style='margin-top:8px'>{desc}</div></div>", unsafe_allow_html=True)
+            st.write("")
