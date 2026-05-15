@@ -23,7 +23,22 @@ def get_script():
         st.error(f"Error reading data file: {e}")
         return ["No data available"] * 3
 
-    reactions = data.get("fan_reactions", [])
+    # keep backward compatibility: simple list of strings
+    simple_reactions = data.get("fan_reactions", [])
+    detailed = data.get("fan_reactions_detailed", [])
+
+    # build a merged reactions list: prioritize detailed entries formatted, then simple strings
+    reactions = []
+    for d in detailed:
+        try:
+            user = d.get('user') or d.get('handle') or 'user'
+            time_str = d.get('created_at') or ''
+            text = d.get('text') or ''
+            reactions.append(f"{user}: {text} [{time_str}]")
+        except Exception:
+            continue
+    # append simple legacy reactions
+    reactions.extend(simple_reactions)
     if len(reactions) < 3:
         return random.choices(reactions or ["No data available"], k=3)
     return random.sample(reactions, 3)
@@ -92,6 +107,19 @@ def generate_prediction(reactions, min_words=40, max_words=100):
     seed_phrases.append("Given the volume and tenor of reactions, social observers expect an incident framed as deliberate or 'strategic'.")
     seed_phrases.append("On the next over, narratives suggest a subtle fielding lapse will be interpreted as intentional by vocal groups.")
     seed_phrases.append("This could lead to trending hashtags, heated commentary, and renewed scrutiny of umpiring and team tactics.")
+
+    # bilingual/Hindi support: occasionally insert Hindi phrases or mixed-language sentences
+    hindi_clips = [
+        "यह धोखाधड़ी लगती है",
+        "क्या चल रहा है",
+        "बॉल अचानक ऐसा घूम गया",
+        "ये मैच कुछ गड़बड़ सा है",
+        "फैंस गुस्से में हैं"
+    ]
+    # randomly include one Hindi clip to make the prediction bilingual
+    import random as _rand
+    if _rand.random() < 0.7:  # 70% chance to include Hindi flavor
+        seed_phrases.append(_rand.choice(hindi_clips))
 
     # assemble paragraphs until min_words reached
     sentences = []

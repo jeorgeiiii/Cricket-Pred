@@ -106,4 +106,84 @@
     "Dewald Brevis ka ek six seedha stand mein gaya, banda genuinely dangerous ho gaya hai",
     "Teen platforms pe fantasy team change ki aaj — Akash Maharaj Singh ko pick nahi kiya tha, toot gaya dil 💔"
   ]
+  ,
+  "fan_reactions_detailed": [
+    {
+      "id": "t1",
+      "user": "CricketFan99",
+      "handle": "@cricketfan99",
+      "text": "Bro LSG vs CSK already looking scripted af 😭 first over sixes, second over two wickets kya chal raha hai",
+      "created_at": "2026-05-15T14:02:00Z",
+      "lang": "hi",
+      "location": "Lucknow, IN",
+      "sentiment": "negative",
+      "source": "twitter"
+    },
+    {
+      "id": "t2",
+      "user": "DhoniBeliever",
+      "handle": "@thala_forever",
+      "text": "Thala fans already typing 'Dhoni aao aur bacha lo' 😭",
+      "created_at": "2026-05-15T14:05:10Z",
+      "lang": "hi",
+      "location": "Chennai, IN",
+      "sentiment": "sad",
+      "source": "twitter"
+    },
+    {
+      "id": "t3",
+      "user": "StatsBot",
+      "handle": "@stats_bot",
+      "text": "Akash Maharaj Singh 3 wickets, figures: 3/26 in 4 overs — notable debut impact.",
+      "created_at": "2026-05-15T14:07:30Z",
+      "lang": "en",
+      "location": "",
+      "sentiment": "positive",
+      "source": "automated"
+    },
+    {
+      "id": "t4",
+      "user": "PitchWatcher",
+      "handle": "@pitchwatch",
+      "text": "Ekana pitch showing seam movement early — favors the opening bowlers, which explains early wickets.",
+      "created_at": "2026-05-15T14:03:50Z",
+      "lang": "en",
+      "location": "Lucknow, IN",
+      "sentiment": "neutral",
+      "source": "twitter"
+    },
+    {
+      "id": "t5",
+      "user": "ConspiracyCorner",
+      "handle": "@consp_corner",
+      "text": "DRS reversals, improbable catches and sudden momentum shifts — pattern suggests external influence to many viewers.",
+      "created_at": "2026-05-15T14:08:05Z",
+      "lang": "en",
+      "location": "",
+      "sentiment": "negative",
+      "source": "twitter"
+    },
+    {
+      "id": "t6",
+      "user": "LocalFan",
+      "handle": "@localfan01",
+      "text": "LSG fielders suddenly superman mode on — impossible catches pakad rahe hain, crowd going wild.",
+      "created_at": "2026-05-15T14:06:22Z",
+      "lang": "hi",
+      "location": "Lucknow, IN",
+      "sentiment": "surprised",
+      "source": "twitter"
+    },
+    {
+      "id": "t7",
+      "user": "FanAnalyst",
+      "handle": "@fan_analyst",
+      "text": "Multiple users report the same phrases and hashtags; amplification is high and likely to trend in under 10 minutes.",
+      "created_at": "2026-05-15T14:09:00Z",
+      "lang": "en",
+      "location": "",
+      "sentiment": "neutral",
+      "source": "twitter"
+    }
+  ]
 }
