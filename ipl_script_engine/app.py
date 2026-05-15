@@ -71,6 +71,59 @@ def analyze_reactions(reactions):
     return analysis
 
 
+def generate_prediction(reactions, min_words=40, max_words=100):
+    import re
+    from collections import Counter
+    import random
+
+    # prepare word tokens from reactions
+    joined = " ".join(reactions)
+    words = re.findall(r"\w+", joined.lower())
+    stopwords = {
+        'the','and','a','to','is','in','for','of','on','with','that','this','it','as','are','be'
+    }
+    filtered = [w for w in words if w not in stopwords]
+    common = [w for w,_ in Counter(filtered).most_common(6)]
+
+    # base sentences that reference the idea of a 'strategic' misfield
+    seed_phrases = []
+    if common:
+        seed_phrases.append(f"Fans repeatedly mention {', '.join(common)} in their posts, which frames the context.")
+    seed_phrases.append("Given the volume and tenor of reactions, social observers expect an incident framed as deliberate or 'strategic'.")
+    seed_phrases.append("On the next over, narratives suggest a subtle fielding lapse will be interpreted as intentional by vocal groups.")
+    seed_phrases.append("This could lead to trending hashtags, heated commentary, and renewed scrutiny of umpiring and team tactics.")
+
+    # assemble paragraphs until min_words reached
+    sentences = []
+    # always state the core prediction early
+    sentences.append("Prediction: A 'strategic' misfield is likely to occur in the next over, according to the prevailing fan chatter and sentiment.")
+    sentences.extend(seed_phrases)
+
+    # add a bit of explanatory padding using recycled reactions
+    extras = [r for r in reactions if r and r != "No data available"]
+    random.shuffle(extras)
+    for e in extras:
+        clean = re.sub(r"\s+", " ", e.strip())
+        if clean:
+            sentences.append(f"For example, users said: \"{clean}\".")
+        if len(" ".join(sentences).split()) >= min_words:
+            break
+
+    # pad further with general context sentences if still short
+    while len(" ".join(sentences).split()) < min_words:
+        sentences.append(
+            "Monitoring this thread over the next few minutes should confirm whether the reaction is transient or part of a larger pattern of orchestrated responses."
+        )
+
+    prediction = " ".join(sentences)
+    # enforce maximum length
+    words_list = prediction.split()
+    if len(words_list) > max_words:
+        prediction = " ".join(words_list[:max_words]).rstrip() + "..."
+
+    return prediction
+
+
 def fetch_gnews(query, api_key, max_results=5, lang='en'):
     url = 'https://gnews.io/api/v4/search'
     params = {'q': query, 'token': api_key, 'lang': lang, 'max': max_results}
@@ -134,7 +187,9 @@ if st.button('Generate New Plot Twist'):
     st.info(f"🚨 **LEAKED SCRIPT:** {points[0]}")
     st.warning(f"🕵️ **MATCH ANOMALY:** {points[1]}")
     st.error(f"💀 **THE CLIMAX:** {points[2]}")
-    st.success("Prediction: A 'strategic' misfield is coming next over.")
+    prediction = generate_prediction(points, min_words=40, max_words=100)
+    st.subheader("Prediction")
+    st.write(prediction)
 
 st.write("---")
 st.write("Monitoring live sentiment for LSG vs CSK...")
