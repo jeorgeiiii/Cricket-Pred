@@ -19,7 +19,10 @@ st.markdown(
             .mui-card { background: #fff; border-radius:12px; padding:16px; box-shadow: 0 6px 18px rgba(22,28,45,0.08); }
             .mui-row { display:flex; gap:12px; }
             .mui-card.small { flex:1; }
-            .prediction-box { background: linear-gradient(90deg, #f7f9fb, #ffffff); border-radius:10px; padding:16px; }
+            .prediction-box { background: linear-gradient(90deg, #f7f9fb, #ffffff); border-radius:10px; padding:16px; color:#000 !important; }
+            .prediction-box h4 { color:#000 !important; margin:0 0 8px 0 }
+            .prediction-box, .prediction-box * { color: #000 !important; }
+            .prediction-box a { color: #000 !important; text-decoration: underline; }
             .muted { color:#666; font-size:14px }
             .news-link { color:#1a73e8; text-decoration:none; }
             .icon { font-size:26px }
